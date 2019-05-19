@@ -1,4 +1,4 @@
-from faker import Faker
+import factory.random
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -38,8 +38,8 @@ class Command(BaseCommand):
                 if options['clean']:
                     self._clean_db()
 
-                faker_seed = options.get('seed')
-                self._seed_faker(faker_seed)
+                seed = options.get('seed')
+                self._set_seed(seed)
 
                 self._load_fixtures()
 
@@ -57,10 +57,10 @@ class Command(BaseCommand):
 
         self.stdout.write("Database flush completed successfully.")
 
-    def _seed_faker(self, seed):
+    def _set_seed(self, seed):
+        """Set factory_boy's seed so that "randomization" can be reproduced."""
         self.stdout.write(f"Using seed \'{seed}\' for randomization.")
-        fake = Faker()
-        fake.seed(seed)
+        factory.random.reseed_random(seed)
 
     def _load_fixtures(self):
         """
